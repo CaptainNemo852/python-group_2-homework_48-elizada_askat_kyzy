@@ -1,10 +1,10 @@
 from django import forms
-from webapp.models import Food, OrderFood, Order
+from webapp.models import Food, OrderFood
 
 class OrderFoodForm(forms.ModelForm):
     class Meta:
         model = OrderFood
-        exclude = []
+        exclude = ['order']
 
 
 class FoodForm(forms.ModelForm):
@@ -15,5 +15,5 @@ class FoodForm(forms.ModelForm):
 
 class OrderForm(forms.ModelForm):
     class Meta:
-        model = Order
+        model = OrderFood
         exclude = []

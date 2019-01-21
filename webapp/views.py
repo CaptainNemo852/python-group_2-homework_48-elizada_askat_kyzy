@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View, FormView
 from django.http import HttpResponseRedirect, JsonResponse
 from webapp.models import Order, Food, OrderFood
 from webapp.forms import OrderFoodForm, FoodForm, OrderForm
@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
-
+# Create your views here.
 
 class OrderListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Order
@@ -14,7 +14,7 @@ class OrderListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = 'webapp.view_order'
 
 
-class OrderDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class OrderDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView, FormView):
     model = Order
     template_name = 'order_detail.html'
     permission_required = 'webapp.view_order'
@@ -86,6 +86,7 @@ class OrderDeliverView(PermissionRequiredMixin, View):
 
 
 
+
 class OrderFoodCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = OrderFood
     form_class = OrderFoodForm
@@ -93,14 +94,14 @@ class OrderFoodCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateVie
 
     def form_valid(self, form):
         order = get_object_or_404(Order, pk=self.kwargs.get('pk'))
-        form.instance.order_pk = order
+        form.instance.order = order
         order_food = form.save()
         return JsonResponse({
             'food_name': order_food.food.name,
             'food_pk': order_food.food.pk,
             'amount': order_food.amount,
             'pk': order_food.pk,
-            'edit_url': reverse('order_food_update', kwargs={'pk': order_food.pk})
+            'edit_url': reverse('webapp:order_food_update', kwargs={'pk': order_food.pk})
         })
 
     def form_invalid(self, form):
@@ -128,6 +129,7 @@ class OrderFoodUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVie
         return JsonResponse({
             'errors': form.errors
         }, status='422')
+
 
 
 
@@ -166,6 +168,7 @@ class FoodCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('webapp:food_detail', kwargs={'pk': self.object.pk})
+
 
 
 
