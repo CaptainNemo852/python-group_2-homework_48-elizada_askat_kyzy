@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Статьи{% endblock %}
+{% block menu %}
+        {% if perms.webapp.add_order %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'webapp:order_create' %}">Заполнять данные для заказа</a>
+            </li>
+        {% endif %}
+{% endblock %}
+{% block content %}
+        {% for order in order_list %}
+            <div class="mb-4 mt-4">
+            <a href="{% url 'webapp:order_detail' order.pk %}">
+                {% for order_food in order.foods.all %}
+                    <h4>{{ order_food.food.name }}</h4>
+                {% endfor %}
+                <h6>Заказчик: {{ order.contact_name }}</h6>
+                <h6>Статус: {{ order.get_status_display }}</h6>
+            </a>
+            </div>
+        {% endfor %}
+{% endblock %}
